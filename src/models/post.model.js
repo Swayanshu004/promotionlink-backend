@@ -13,13 +13,11 @@ const postSchema = new Schema({
         type: String,
     },
     category: {
-        //  Beauty, sports, tech, finanace... etc.
         type:  String,
         enum: ["NaN","Lifestyle","Fashion","Beauty","Fitness","Tech","Travel","Food","Gaming","Educational","Parenting"],
         default: "NaN"
     }, 
     creatorType: {
-        //  Beginner, Intermediate, Advance
         type:  String,
         enum: ["NaN","Beginner","Intermediate","Advance"],
         default: "NaN"
@@ -39,6 +37,10 @@ const postSchema = new Schema({
     },
     price: {
         //  per promotion
+        type: Number,
+        required: true,
+    },
+    totalPromotions: {
         type: Number,
         required: true,
     },

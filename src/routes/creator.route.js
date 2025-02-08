@@ -1,6 +1,4 @@
 import express from "express"
-import nacl from "tweetnacl";
-import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { Creator } from "../models/creator.model.js"
 import { Post } from "../models/post.model.js";
 import { postRequest } from "../models/postRequest.model.js";
@@ -15,45 +13,21 @@ router
     })
 router
     .post('/signin', async (req, res)=>{
-        // console.log(req.body);
-        const {name, publicKey, instagramUrl, youtubeUrl, phoneNo, category, password, signature} = req.body;
-        const message = new TextEncoder().encode("Sign into easyPROMO-CREATOR");
-        console.log(publicKey," - ",signature);
-        const result = nacl.sign.detached.verify(
-            message,
-            new Uint8Array(signature.data),
-            new PublicKey(publicKey).toBytes(),
-        );
-        console.log(result);
-        if(!result){
-            res.status(401).send("unverified Wallet Details.")
-        }
-
-        const existedUser = await Creator.findOne({
-            $or: [{ address: publicKey }]
+        const {name, email, instagramUrl, youtubeUrl, phoneNo, category, password} = req.body;
+        const creator = await Creator.create({
+            name,
+            email,
+            instagramUrl,
+            youtubeUrl,
+            phoneNo,
+            category,
+            password
         })
-        if(existedUser){
-            const token = jwt.sign({
-                creatorId: existedUser.id,
-            }, process.env.JWT_SECRET_CREATOR)
-            
-            res.status(201).json({token});
-        } else {
-            const creator = await Creator.create({
-                name,
-                address: publicKeye,
-                instagramUrl,
-                youtubeUrl,
-                phoneNo,
-                category,
-                password
-            })
-            const token = jwt.sign({
-                creatorId: creator.id,
-            }, process.env.JWT_SECRET_CREATOR)
+        const token = jwt.sign({
+            creatorId: creator.id,
+        }, process.env.JWT_SECRET_CREATOR)
 
-            res.status(201).json({token});
-        }
+        res.status(201).json({token});
     })
 router
     .post('/request/:postId', async(req, res)=>{

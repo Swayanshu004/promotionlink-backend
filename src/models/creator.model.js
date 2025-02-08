@@ -7,11 +7,10 @@ const creatorSchema = new Schema(
             type: String,
             required: true
         },
-        address: {
+        email: {
             type: String,
             required: true,
             unique: true,
-            trim:true
         },
         instagramUrl: {
             type: String,   
@@ -27,18 +26,10 @@ const creatorSchema = new Schema(
             enum: ["NaN","Lifestyle","Fashion","Beauty","Fitness","Tech","Travel","Food","Gaming","Educational","Parenting"],
             default: "NaN"
         },
-        password: {
+        password: { 
             type: String,
             required: [true , "password is required"],
         },
-        balance: {
-            type: Number,
-            default: 0,
-        },
-        pendingAmount: {
-            type: Number,
-            default: 0
-        }
     }, {
         timestamps: true
     }

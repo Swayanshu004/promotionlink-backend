@@ -8,11 +8,10 @@ const brandSchema = new Schema(
             type: String,
             required: true
         },
-        address: {
+        email: {
             type: String,
             required: true,
             unique: true,
-            trim:true
         },
         officialUrl: {
             type: String,
