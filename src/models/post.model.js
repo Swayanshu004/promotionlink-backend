@@ -40,7 +40,7 @@ const postSchema = new Schema({
         type: Number,
         required: true,
     },
-    totalPromotions: {
+    totalPromotionsRemaining: {
         type: Number,
         required: true,
     },

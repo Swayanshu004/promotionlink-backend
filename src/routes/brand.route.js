@@ -37,7 +37,7 @@ router
         const brandId = '66c8994b3b20e9b74da374dc';
         const cloudinaryLink = await uploadOnCloudinary(imageLocalPath);
         
-        const {title, category ,productUrl, creatorType, contentType, description, price, totalPromotions, accept} = req.body;
+        const {title, category ,productUrl, creatorType, contentType, description, price, totalPromotionsRemaining, accept} = req.body;
         const ImageUrl = cloudinaryLink.url;
     
         const post = await Post.create({
@@ -50,7 +50,7 @@ router
             description,
             createdBy: brandId,
             price,
-            totalPromotions,
+            totalPromotionsRemaining,
             accept,
         })
         res.status(201).json({post});
@@ -105,9 +105,13 @@ router
         if(!post){
             res.status(401),send("postId not valid");
         }
-        
+        console.log(post[0].price);
+        await Post.updateOne(
+            { _id: req.params.postId },
+            { $inc: { totalPromotionsRemaining: -1} }
+        )
         res.status(201).json({
-            message: "Pocessing",
+            message: "Approved",
         });
     })    
 export default router; 
