@@ -8,10 +8,6 @@ const transactionSchema = new Schema({
         type: Number,
         required: true
     },
-    signature: {
-        type: String,
-        required: true
-    },
     status: {
         type: String,
         enum: ["Processing","Success","Failure"],

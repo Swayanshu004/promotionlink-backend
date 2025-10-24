@@ -12,8 +12,11 @@ router
         res.status(200).send("check for upbot succeed");
     })
 router
-    .post('/signin', async (req, res)=>{
+    .post('/register', async (req, res)=>{
+        
+        console.log(req.body);
         const {name, email, instagramUrl, youtubeUrl, phoneNo, category, password} = req.body;
+        
         const creator = await Creator.create({
             name,
             email,
@@ -28,6 +31,35 @@ router
         }, process.env.JWT_SECRET_CREATOR)
 
         res.status(201).json({token});
+    })
+router
+    .post('/signin', async (req, res)=>{
+        
+        console.log(req.body);
+        const {email, password} = req.body;
+        if(!email){
+            res.res.status(501).send("Email is Required");
+        }
+        if(!password){
+            res.res.status(501).send("Password is Required");
+        }
+
+        const existedUser = await Creator.findOne({
+            $or: [{ email }]
+        })
+        if(existedUser){
+            let checkpassword = await existedUser.isPasswordCorrect(password);
+            if(!checkpassword) {
+                res.status(401).send("Incorrect Password ! !")
+            }
+
+            const token = jwt.sign({
+            creatorId: existedUser.id,
+        }, process.env.JWT_SECRET_CREATOR)
+            res.status(201).json({token});
+        } else {
+            res.status(501).send("Mail id is not associated with an account. Create a account first ! !");
+        }
     })
 router
     .post('/request/:postId', async(req, res)=>{
@@ -70,10 +102,11 @@ router
         res.status(201).json(postDetails);
     })
 router
-    .get('/profile', async(req, res)=>{
-        const creatorId = '66c7a2ed090040139285667a';
+    .get('/profile', authMiddlewareCreator, async(req, res)=>{
+        // const creatorId = '66c7a2ed090040139285667a';
         // console.log("creatorId - ",creatorId);
         
+        const creatorId = req.creatorId;
         const creatorDetails = await Creator.find({_id: creatorId});
         const requestFromCreator = await postRequest.find({createdBy: creatorId});
         if(!creatorDetails){

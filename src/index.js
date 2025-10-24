@@ -5,12 +5,14 @@ import creatorRoute from './routes/creator.route.js'
 import brandRoute from './routes/brand.route.js'
 import cors from 'cors'
 
+
+
 const app = express()
 const corsOptions = {
-    origin: process.env.ORIGIN,
-    methods: "GET, POST, PATCH, DELETE",
-    credential: true
-  }
+  origin: process.env.ORIGIN,
+  methods: "GET, POST, PATCH, DELETE",
+  credentials: true
+}
 app.use(cors(corsOptions))
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', process.env.ORIGIN); 
@@ -25,9 +27,10 @@ app.use(express.json())
 
 connectDB()
 .then(()=>{
-    console.log("- - MongoDB Connected - -");
-    app.listen(process.env.PORT,()=>{
-        console.log(`- - SERVER STARTED ON PORT : ${process.env.PORT} - -`);
+  console.log("- - MongoDB Connected - -");
+  app.listen(process.env.PORT,()=>{
+    console.log(`- - SERVER STARTED ON PORT : ${process.env.PORT} - -`);
+    console.log(process.env.ORIGIN);
     })
 }
 ).catch((err)=>{

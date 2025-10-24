@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 router
-    .post('/signin', async (req, res)=>{
+    .post('/register', async (req, res)=>{
         console.log(req.body);
         const {name, email, officialUrl, category, password,} = req.body;
 
@@ -25,6 +25,35 @@ router
         }, process.env.JWT_SECRET)
 
         res.status(201).json({token});
+    })
+router
+    .post('/signin', async (req, res)=>{
+        
+        console.log(req.body);
+        const {email, password} = req.body;
+        if(!email){
+            res.res.status(501).send("Email is Required");
+        }
+        if(!password){
+            res.res.status(501).send("Password is Required");
+        }
+
+        const existedBrand = await Brand.findOne({
+            $or: [{ email }]
+        })
+        if(existedBrand){
+            let checkpassword = await existedBrand.isPasswordCorrect(password);
+            if(!checkpassword) {
+                res.status(401).send("Incorrect Password ! !")
+            }
+
+            const token = jwt.sign({
+            creatorId: existedBrand.id,
+        }, process.env.JWT_SECRET)
+            res.status(201).json({token});
+        } else {
+            res.status(501).send("Mail id is not associated with an account. Create a account first ! !");
+        }
     })
 router
     .post('/newpost', upload.single('ImageUrl'), async(req,res)=>{
@@ -59,7 +88,7 @@ router
     .get('/profile', async(req,res)=>{
         console.log("reached /profile");
         
-        const brandId = '66c8994b3b20e9b74da374dc';
+        const brandId = '68fba73907ffcada3dc6bb99';
         const brandDetails = await Brand.find({
             _id: brandId
         })
@@ -98,17 +127,19 @@ router
         console.log(req.params.postId);
 
         const creator = await Creator.find({_id: req.query.creatorId});
-        const post = await Post.find({_id: req.params.postId});
         if(!creator){
             res.status(401),send("Creator not Found");
         }
+        const post = await Post.updateOne(
+            { _id: req.params.postId },
+            { $inc: { totalPromotionsRemaining: -1} }
+        )
         if(!post){
             res.status(401),send("postId not valid");
         }
-        console.log(post[0].price);
-        await Post.updateOne(
-            { _id: req.params.postId },
-            { $inc: { totalPromotionsRemaining: -1} }
+        await postRequest.updateOne(
+            { requestdOn: req.params.postId },
+            { $set: { "approved": true } }
         )
         res.status(201).json({
             message: "Approved",
